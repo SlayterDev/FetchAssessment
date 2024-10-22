@@ -8,7 +8,7 @@
 import Foundation
 
 protocol RecipeAPI {
-    func fetchRecipes() async throws -> RecipeRespnse
+    func fetchRecipes() async throws -> RecipeResponse
 }
 
 enum RecipeError: Error {
@@ -26,12 +26,18 @@ struct DefaultRecipeAPI: RecipeAPI {
         static let emptyApiEndpoint = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
     }
 
-    func fetchRecipes() async throws -> RecipeRespnse {
+    func fetchRecipes() async throws -> RecipeResponse {
         guard let url = URL(string: Constants.apiEndpoint) else {
             throw RecipeError.badURL
         }
         let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(RecipeRespnse.self, from: data)
+        let response = try JSONDecoder().decode(RecipeResponse.self, from: data)
         return response
+    }
+}
+
+struct PreviewRecipeAPI: RecipeAPI {
+    func fetchRecipes() async throws -> RecipeResponse {
+        return RecipeResponse.previewData
     }
 }

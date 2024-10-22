@@ -8,17 +8,48 @@
 import SwiftUI
 
 struct RecipesView: View {
+
+    @ObservedObject var viewModel: RecipesViewModel
+
+    var listView: some View {
+        ScrollView {
+            LazyVStack {
+                ForEach(viewModel.recipes) { recipe in
+                    RecipeView(recipe: recipe)
+                }
+            }
+        }
+    }
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            if viewModel.isLoading {
+                ProgressView()
+            } else {
+                if viewModel.error != nil {
+                    // Show error state
+                    EmptyView()
+                } else if !viewModel.recipes.isEmpty {
+                    listView
+                } else {
+                    Text("No recipes found. Come back later! 🍳")
+                }
+            }
         }
         .padding()
+        .navigationTitle("Recipes")
+        .onAppear {
+            Task { @MainActor in
+                await viewModel.fetchRecipes()
+            }
+        }
     }
 }
 
 #Preview {
-    RecipesView()
+    NavigationStack {
+        RecipesView(
+            viewModel: RecipesViewModel(recipesApi: PreviewRecipeAPI())
+        )
+    }
 }
