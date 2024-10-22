@@ -42,7 +42,7 @@ struct LinkButton: View {
             HStack {
                 Image(systemName: type == .youtube ? "video" : "link")
 
-                Text(type == .youtube ? "Youtube" : "Recipe")
+                Text(type == .youtube ? "YouTube" : "Recipe")
             }
             .frame(maxWidth: .infinity)
         }

@@ -11,18 +11,20 @@ struct RecipesView: View {
 
     @ObservedObject var viewModel: RecipesViewModel
 
+    func loadRecipes() async {
+        await viewModel.fetchRecipes()
+    }
+
     var listView: some View {
-        ScrollView {
-            LazyVStack {
-                ForEach(viewModel.recipes) { recipe in
-                    RecipeView(recipe: recipe)
-                }
+        LazyVStack {
+            ForEach(viewModel.recipes) { recipe in
+                RecipeView(recipe: recipe)
             }
         }
     }
 
     var body: some View {
-        VStack {
+        ScrollView {
             if viewModel.isLoading {
                 ProgressView()
             } else {
@@ -36,11 +38,15 @@ struct RecipesView: View {
                 }
             }
         }
-        .padding()
+        .refreshable {
+            await loadRecipes()
+        }
+        .padding([.horizontal, .bottom])
+        .ignoresSafeArea(.container, edges: [.bottom])
         .navigationTitle("Recipes")
         .onAppear {
-            Task { @MainActor in
-                await viewModel.fetchRecipes()
+            Task {
+                await loadRecipes()
             }
         }
     }
