@@ -55,6 +55,8 @@ struct RecipeView: View {
                    let sourceUrl = URL(string: sourceUrlStr) {
                     LinkButton(type: .recipeLink, url: sourceUrl)
                 }
+
+                Spacer()
             }
         }
     }

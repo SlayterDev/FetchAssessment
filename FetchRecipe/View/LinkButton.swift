@@ -46,7 +46,7 @@ struct LinkButton: View {
 
                 Text(type == .youtube ? "YouTube" : "Recipe")
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: 250)
         }
         .buttonStyle(LinkButtonStyle(type: type))
     }
