@@ -7,25 +7,23 @@
 
 import Foundation
 
+// Define our API as a protocol to enable dependency injection
 protocol RecipeAPI {
     func fetchRecipes() async throws -> RecipeResponse
 }
 
 enum RecipeError: Error {
     case badURL
-    case invalidResponse
-    case malformedResponse
-    case emptyResponse
 }
 
 class DefaultRecipeAPI: RecipeAPI {
 
+    // Enum and endpoint variable to allow overriding the current endpoint for testing
     enum Endpoints: String {
         case api = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
         case malformedApi = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json"
         case emptyApi = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
     }
-
     var currentEndpoint: String = Endpoints.api.rawValue
 
     func decodeResponse(_ data: Data) throws -> RecipeResponse {
@@ -45,6 +43,7 @@ class DefaultRecipeAPI: RecipeAPI {
     }
 }
 
+// Alternate API definition for SwiftUI previews
 struct PreviewRecipeAPI: RecipeAPI {
     func fetchRecipes() async throws -> RecipeResponse {
         return RecipeResponse.previewData

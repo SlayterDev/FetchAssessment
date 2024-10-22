@@ -8,6 +8,8 @@
 import Testing
 @testable import FetchRecipe
 
+/// Fake API to inject into the view model
+/// This allows us to controlt the "network" response
 class MockRecipeAPI: RecipeAPI {
 
     var mockResponse: (() async throws -> FetchRecipe.RecipeResponse)?

@@ -8,6 +8,7 @@
 import SwiftUI
 import Kingfisher
 
+/// Single recipe view. A "cell" in the recipe list
 struct RecipeView: View {
 
     let recipe: RecipeModel
@@ -15,8 +16,10 @@ struct RecipeView: View {
     var body: some View {
         VStack {
             HStack(alignment: .top) {
+                // KFImage from the Kingfisher library for image caching
                 KFImage(URL(string: recipe.photoUrlLarge ?? ""))
                     .placeholder {
+                        // Fallback if no image
                         VStack {
                             Image(systemName: "photo")
                                 .resizable()
@@ -40,9 +43,9 @@ struct RecipeView: View {
                 }
 
                 Spacer()
-
             }
 
+            // Add buttons for YouTube or recipe link if the URLs exist
             HStack {
                 if let youtubeUrlStr = recipe.youtubeUrl,
                    let youtubeUrl = URL(string: youtubeUrlStr) {

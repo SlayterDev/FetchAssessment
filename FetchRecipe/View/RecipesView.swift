@@ -7,10 +7,12 @@
 
 import SwiftUI
 
+/// Main app view
+/// This view contains the list of recipes and communicates with the ViewModel
 struct RecipesView: View {
 
     @ObservedObject var viewModel: RecipesViewModel
-    @State var showDebugMenu: Bool = false
+    @State var showDebugMenu: Bool = false // For overriding API endpoints
 
     func loadRecipes() async {
         await viewModel.fetchRecipes()
@@ -31,21 +33,25 @@ struct RecipesView: View {
                     ProgressView()
                 } else {
                     if viewModel.error != nil {
+                        // Error state
                         VStack {
                             Text("An error occured while loading recipes.")
                             Text("Pull to refresh to try again.")
                         }
                     } else if !viewModel.recipes.isEmpty {
+                        // Default state with data
                         listView
                     } else {
+                        // Empty state
                         Text("No recipes found. Come back later! 🍳")
                     }
                 }
             }
-            .refreshable {
+            .refreshable { // Enables pull to refresh
                 await loadRecipes()
             }
 
+            // Floating Action Button - for debug menu
             VStack {
                 Spacer()
 
@@ -70,12 +76,13 @@ struct RecipesView: View {
         .ignoresSafeArea(.container, edges: [.bottom])
         .navigationTitle("Recipes")
         .onAppear {
+            // Load recipes on app start
             Task {
                 await loadRecipes()
             }
         }
-        .alert("Change API Endpoint", isPresented: $showDebugMenu,
-               actions: {
+        .alert("Change API Endpoint", isPresented: $showDebugMenu, actions: {
+            // Debug menu
             Button("Default") {
                 viewModel.changeApiEndpoint(to: .api)
             }
@@ -86,8 +93,7 @@ struct RecipesView: View {
                 viewModel.changeApiEndpoint(to: .emptyApi)
             }
             Button("Cancel", role: .cancel) { }
-        },
-               message: {
+        }, message: {
             Text("Select an option to change the API endpoint.")
         })
     }

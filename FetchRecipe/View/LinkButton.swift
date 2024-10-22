@@ -7,11 +7,13 @@
 
 import SwiftUI
 
+/// ButtonType enum allows us to customize button appearance
 enum ButtonType {
     case youtube
     case recipeLink
 }
 
+/// Common Button style for the buttons that take the user to the recipe or YouTube
 struct LinkButtonStyle: ButtonStyle {
 
     let type: ButtonType

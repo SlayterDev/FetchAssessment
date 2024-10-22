@@ -7,7 +7,9 @@
 
 import Foundation
 
+// Codable model definition to allow decoding network response from JSON
 struct RecipeModel: Codable, Identifiable {
+    /// `Identifiable` conformance for SwiftUI `ForEach`
     var id: String { uuid }
 
     let cuisine: String
@@ -18,6 +20,8 @@ struct RecipeModel: Codable, Identifiable {
     let sourceUrl: String?
     let youtubeUrl: String?
 
+    // CodingKeys to override the JSON key for certain fields
+    // This allows us to decode the JSON while maintaining Swift style guidelines
     enum CodingKeys: String, CodingKey {
         case cuisine
         case name
@@ -29,9 +33,11 @@ struct RecipeModel: Codable, Identifiable {
     }
 }
 
+// Container model to conform to API response
 struct RecipeResponse: Codable {
     let recipes: [RecipeModel]
 
+    // Preview data for use in testing and SwiftUI previews
     static let previewData: RecipeResponse = .init(recipes: [
         RecipeModel(
             cuisine: "French",
