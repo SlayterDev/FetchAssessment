@@ -34,4 +34,8 @@ class RecipesViewModel: ObservableObject {
         }
     }
 
+    func changeApiEndpoint(to newEndpoint: DefaultRecipeAPI.Endpoints) {
+        (recipesApi as? DefaultRecipeAPI)?.setEndpoint(to: newEndpoint)
+    }
+
 }

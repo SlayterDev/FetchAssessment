@@ -18,21 +18,30 @@ enum RecipeError: Error {
     case emptyResponse
 }
 
-struct DefaultRecipeAPI: RecipeAPI {
+class DefaultRecipeAPI: RecipeAPI {
 
-    enum Constants {
-        static let apiEndpoint = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
-        static let malformedApiEndpoint = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json"
-        static let emptyApiEndpoint = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
+    enum Endpoints: String {
+        case api = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes.json"
+        case malformedApi = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-malformed.json"
+        case emptyApi = "https://d3jbb8n5wk0qxi.cloudfront.net/recipes-empty.json"
+    }
+
+    var currentEndpoint: String = Endpoints.api.rawValue
+
+    func decodeResponse(_ data: Data) throws -> RecipeResponse {
+        return try JSONDecoder().decode(RecipeResponse.self, from: data)
     }
 
     func fetchRecipes() async throws -> RecipeResponse {
-        guard let url = URL(string: Constants.apiEndpoint) else {
+        guard let url = URL(string: currentEndpoint) else {
             throw RecipeError.badURL
         }
         let (data, _) = try await URLSession.shared.data(from: url)
-        let response = try JSONDecoder().decode(RecipeResponse.self, from: data)
-        return response
+        return try decodeResponse(data)
+    }
+
+    func setEndpoint(to endpoint: Endpoints) {
+        currentEndpoint = endpoint.rawValue
     }
 }
 

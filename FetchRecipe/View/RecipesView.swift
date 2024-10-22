@@ -10,6 +10,7 @@ import SwiftUI
 struct RecipesView: View {
 
     @ObservedObject var viewModel: RecipesViewModel
+    @State var showDebugMenu: Bool = false
 
     func loadRecipes() async {
         await viewModel.fetchRecipes()
@@ -24,22 +25,46 @@ struct RecipesView: View {
     }
 
     var body: some View {
-        ScrollView {
-            if viewModel.isLoading {
-                ProgressView()
-            } else {
-                if viewModel.error != nil {
-                    // Show error state
-                    EmptyView()
-                } else if !viewModel.recipes.isEmpty {
-                    listView
+        ZStack {
+            ScrollView {
+                if viewModel.isLoading {
+                    ProgressView()
                 } else {
-                    Text("No recipes found. Come back later! 🍳")
+                    if viewModel.error != nil {
+                        VStack {
+                            Text("An error occured while loading recipes.")
+                            Text("Pull to refresh to try again.")
+                        }
+                    } else if !viewModel.recipes.isEmpty {
+                        listView
+                    } else {
+                        Text("No recipes found. Come back later! 🍳")
+                    }
                 }
             }
-        }
-        .refreshable {
-            await loadRecipes()
+            .refreshable {
+                await loadRecipes()
+            }
+
+            VStack {
+                Spacer()
+
+                HStack {
+                    Spacer()
+                    Button {
+                        showDebugMenu = true
+                    } label: {
+                        Image(systemName: "ladybug.slash")
+                            .renderingMode(.template)
+                            .font(.title)
+                            .foregroundColor(.white)
+                    }
+                    .frame(width: 50, height: 50)
+                    .background(Color.accentColor)
+                    .clipShape(Circle())
+                }
+                .padding()
+            }
         }
         .padding([.horizontal, .bottom])
         .ignoresSafeArea(.container, edges: [.bottom])
@@ -49,6 +74,22 @@ struct RecipesView: View {
                 await loadRecipes()
             }
         }
+        .alert("Change API Endpoint", isPresented: $showDebugMenu,
+               actions: {
+            Button("Default") {
+                viewModel.changeApiEndpoint(to: .api)
+            }
+            Button("Malformed Data") {
+                viewModel.changeApiEndpoint(to: .malformedApi)
+            }
+            Button("Empty Data") {
+                viewModel.changeApiEndpoint(to: .emptyApi)
+            }
+            Button("Cancel", role: .cancel) { }
+        },
+               message: {
+            Text("Select an option to change the API endpoint.")
+        })
     }
 }
 
