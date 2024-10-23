@@ -20,8 +20,8 @@ struct LinkButtonStyle: ButtonStyle {
 
     func makeBody(configuration: Configuration) -> some View {
         let backgroundColor = type == .youtube
-            ? Color("YoutubeButton")
-            : Color("LinkButton")
+            ? Color("YoutubeRed")
+            : Color("PrimaryBlue")
 
         configuration.label
             .font(.headline)

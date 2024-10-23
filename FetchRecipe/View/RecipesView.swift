@@ -66,7 +66,7 @@ struct RecipesView: View {
                             .foregroundColor(.white)
                     }
                     .frame(width: 50, height: 50)
-                    .background(Color.accentColor)
+                    .background(Color("PrimaryBlue"))
                     .clipShape(Circle())
                 }
                 .padding()

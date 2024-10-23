@@ -9,10 +9,12 @@ import Testing
 @testable import FetchRecipe
 
 /// Fake API to inject into the view model
-/// This allows us to controlt the "network" response
+/// This allows us to control the "network" response
 class MockRecipeAPI: RecipeAPI {
 
-    var mockResponse: (() async throws -> FetchRecipe.RecipeResponse)?
+    typealias MockResponse = (() async throws -> FetchRecipe.RecipeResponse)
+
+    var mockResponse: MockResponse?
 
     func fetchRecipes() async throws -> FetchRecipe.RecipeResponse {
         if let response = mockResponse {
@@ -27,9 +29,14 @@ struct FetchRecipeTests {
 
     let mockAPI = MockRecipeAPI()
 
-    @Test func whenRecipesAreFetchedDataIsReturned() async throws {
+    func setupViewModel(_ mockResponse: @escaping MockRecipeAPI.MockResponse) -> RecipesViewModel {
         let viewModel = RecipesViewModel(recipesApi: mockAPI)
-        mockAPI.mockResponse = {
+        mockAPI.mockResponse = mockResponse
+        return viewModel
+    }
+
+    @Test func whenRecipesAreFetchedDataIsReturned() async throws {
+        let viewModel = setupViewModel() {
             return .previewData
         }
         await viewModel.fetchRecipes()
@@ -40,8 +47,7 @@ struct FetchRecipeTests {
     }
 
     @Test func whenErrorOccursDataIsNotReturned() async throws {
-        let viewModel = RecipesViewModel(recipesApi: mockAPI)
-        mockAPI.mockResponse = {
+        let viewModel = setupViewModel() {
             throw RecipeError.badURL
         }
         await viewModel.fetchRecipes()
@@ -52,8 +58,7 @@ struct FetchRecipeTests {
     }
 
     @Test func whenNoDataIsReturnedRecipesIsEmpty() async throws {
-        let viewModel = RecipesViewModel(recipesApi: mockAPI)
-        mockAPI.mockResponse = {
+        let viewModel = setupViewModel() {
             return .init(recipes: [])
         }
         await viewModel.fetchRecipes()
@@ -103,6 +108,23 @@ struct FetchRecipeTests {
         #expect(response.recipes.count == 3)
         #expect(response.recipes.last?.sourceUrl == nil)
         #expect(response.recipes.first?.cuisine == "Malaysian")
+    }
+
+    @Test func whenViewModelSwitchesEndpointThenAPIEndpointChanges() {
+        /// Get the current API endpoint by casting the `viewModel`'s `recipesApi` to a `DefaultRecipeAPI` instance
+        func getAPIEndpoint(from viewModel: RecipesViewModel) -> String? {
+            guard let api = viewModel.recipesApi as? DefaultRecipeAPI else {
+                return nil
+            }
+            return api.currentEndpoint
+        }
+
+        let viewModel = RecipesViewModel()
+        #expect(getAPIEndpoint(from: viewModel) == DefaultRecipeAPI.Endpoints.api.rawValue)
+        viewModel.changeApiEndpoint(to: .malformedApi)
+        #expect(getAPIEndpoint(from: viewModel) == DefaultRecipeAPI.Endpoints.malformedApi.rawValue)
+        viewModel.changeApiEndpoint(to: .emptyApi)
+        #expect(getAPIEndpoint(from: viewModel) == DefaultRecipeAPI.Endpoints.emptyApi.rawValue)
     }
 
 }

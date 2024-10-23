@@ -46,6 +46,6 @@ class DefaultRecipeAPI: RecipeAPI {
 // Alternate API definition for SwiftUI previews
 struct PreviewRecipeAPI: RecipeAPI {
     func fetchRecipes() async throws -> RecipeResponse {
-        return RecipeResponse.previewData
+        return .previewData
     }
 }
