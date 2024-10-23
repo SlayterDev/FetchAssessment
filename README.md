@@ -9,11 +9,14 @@
 **Architecture:** I wanted to focus on the MVVM architecture which compliments SwiftUI well. To aid in development and testing I also set up the ViewModel to allow dependency injection
 for the source of the API. This way I had the normal live API, a preview implementation which only returns static data for SwiftUI previews, and a Mock implementation for unit tests which I
 could modify to return anything including error states.
+
 **Concurrency:** Modern Swift allows us to use async/await to handle asynchronous tasks with ease. I made use of this particularly with API calls. When the app first loads the list of recipes
 or when the user requests a refresh we do this in the background to not block the UI. In SwiftUI the former is done using `onAppear` which is a synchronous process. We use `Task` to run our
 async fetch method, we then tag the fetch method of the ViewModel with the `@MainActor` macro to ensure any view updates happen on the main thread (avoiding crashes).
+
 **UI/UX:** My expertise is not in design but I made use of SwiftUI's built in functionality to ensure the app looks good in light and dark appearances. Using named or system colors keeps the
 look and feel consistent. While not the prettiest on the iPad, using SwiftUI's layout APIs the app looks consistent and usable across device size classes.
+
 **Performance Optimization:** To ensure the app remains scalable no matter how many recipes we throw at it I utilized `LazyVStack` to display the recipes. This ensures we only render recipes
 as needed and won't bother drawing ones we haven't seen yet. It also provides more customization over `List` for the look of our elements. In addition since image caching was a requirement,
 it made sense to go with an existing library rather than roll my own solution for development ease but also performance. Kingfisher provides image caching and has integration for SwiftUI. This
